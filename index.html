@@ -1,24 +1,75 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Autoplay MP3</title>
+<title>Audio Autoplay</title>
 <style>
-  html,body{height:100%;margin:0;display:grid;place-items:center;font-family:system-ui}
-  button{font-size:1.1rem;padding:0.8rem 1.2rem;cursor:pointer}
+  :root { font-family: system-ui; }
+  body { margin:0; min-height:100dvh; display:grid; place-items:center; }
+  main { width:min(680px, 92vw); text-align:center; }
+  ul { list-style:none; padding:0; margin:1rem 0 0; }
+  li { margin:.4rem 0; }
+  a, button { font-size:1.05rem; text-decoration:none; padding:.6rem 1rem; border:1px solid #ccc; border-radius:.6rem; display:inline-block; }
+  a:hover, button:hover { background:#f5f5f5; }
 </style>
 
-<audio id="player" src="track.mp3" preload="auto"></audio>
+<main id="app">
+  <noscript>Bitte JavaScript aktivieren.</noscript>
+</main>
+
 <script>
-(async () => {
-  const p = document.getElementById('player');
-  try {
-    await p.play();
-    document.body.textContent = '🎧 Wiedergabe läuft';
-  } catch {
-    const b = document.createElement('button');
-    b.textContent = '▶️ Abspielen';
-    b.onclick = () => p.play().then(() => b.replaceWith('🎧 Wiedergabe läuft'));
-    document.body.appendChild(b);
+  // Liste deiner Dateien. Namen und Endungen genau wie im Repo.
+  const files = [
+    { name: "Fühlbild aus Nägeln", file: "Fühlbild aus Nägeln.m4a" },
+    { name: "Tischbau",            file: "Tischbau.m4a" },
+    { name: "Hörmemory",           file: "Hörmemory.m4a" },
+    { name: "Balancierweg",        file: "Balancierweg.m4a" },
+    { name: "Barfußweg",           file: "Barfußweg.m4a" },
+    { name: "Fühlkiste",           file: "Fühlkiste.m4a" }
+  ];
+
+  const app = document.getElementById("app");
+  const params = new URLSearchParams(location.search);
+  const queryFile = params.get("f");    // z. B. ?f=Fühlkiste.m4a
+
+  function renderList() {
+    const h = document.createElement("h1");
+    h.textContent = "Audios";
+    const p = document.createElement("p");
+    p.textContent = "Klicke auf einen Titel. Der Link öffnet diese Seite mit Autoplay-Versuch.";
+    const ul = document.createElement("ul");
+
+    for (const {name, file} of files) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `?f=${encodeURIComponent(file)}`;
+      a.textContent = `▶ ${name}`;
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+    app.replaceChildren(h, p, ul);
   }
-})();
+
+  async function playFile(filename) {
+    const audio = document.createElement("audio");
+    audio.id = "player";
+    audio.preload = "auto";
+    audio.src = filename; // Browser kümmert sich um Encoding
+    const label = document.createElement("p");
+    label.textContent = `Lade: ${filename}`;
+    app.replaceChildren(label);
+
+    try {
+      await audio.play();            // Autoplay-Versuch
+      app.textContent = `🎧 Wiedergabe läuft: ${filename}`;
+    } catch {
+      const btn = document.createElement("button");
+      btn.textContent = "▶️ Abspielen";
+      btn.onclick = () => audio.play().then(() => btn.replaceWith("🎧 Wiedergabe läuft"));
+      app.replaceChildren(btn);
+    }
+    document.body.appendChild(audio);
+  }
+
+  if (queryFile) playFile(decodeURIComponent(queryFile));
+  else renderList();
 </script>
