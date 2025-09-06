@@ -1,0 +1,24 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Autoplay MP3</title>
+<style>
+  html,body{height:100%;margin:0;display:grid;place-items:center;font-family:system-ui}
+  button{font-size:1.1rem;padding:0.8rem 1.2rem;cursor:pointer}
+</style>
+
+<audio id="player" src="track.mp3" preload="auto"></audio>
+<script>
+(async () => {
+  const p = document.getElementById('player');
+  try {
+    await p.play();
+    document.body.textContent = '🎧 Wiedergabe läuft';
+  } catch {
+    const b = document.createElement('button');
+    b.textContent = '▶️ Abspielen';
+    b.onclick = () => p.play().then(() => b.replaceWith('🎧 Wiedergabe läuft'));
+    document.body.appendChild(b);
+  }
+})();
+</script>
