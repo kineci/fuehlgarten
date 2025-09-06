@@ -17,7 +17,6 @@
 </main>
 
 <script>
-  // Liste deiner Dateien. Namen und Endungen genau wie im Repo.
   const files = [
     { name: "Fühlbild aus Nägeln", file: "Fühlbild aus Nägeln.m4a" },
     { name: "Tischbau",            file: "Tischbau.m4a" },
@@ -29,13 +28,13 @@
 
   const app = document.getElementById("app");
   const params = new URLSearchParams(location.search);
-  const queryFile = params.get("f");    // z. B. ?f=Fühlkiste.m4a
+  const queryFile = params.get("f");
 
   function renderList() {
     const h = document.createElement("h1");
-    h.textContent = "Audios";
+    h.textContent = "Anleitung Fühlgarten";
     const p = document.createElement("p");
-    p.textContent = "Klicke auf einen Titel. Der Link öffnet diese Seite mit Autoplay-Versuch.";
+    p.textContent = "Klicke auf einen Titel um die Audio abzuspielen.";
     const ul = document.createElement("ul");
 
     for (const {name, file} of files) {
@@ -53,14 +52,14 @@
     const audio = document.createElement("audio");
     audio.id = "player";
     audio.preload = "auto";
-    audio.src = filename; // Browser kümmert sich um Encoding
+    audio.src = filename;
     const label = document.createElement("p");
     label.textContent = `Lade: ${filename}`;
     app.replaceChildren(label);
 
     try {
-      await audio.play();            // Autoplay-Versuch
-      app.textContent = `🎧 Wiedergabe läuft: ${filename}`;
+      await audio.play();
+      app.textContent = `🎧 Wiedergabe läuft: ${filename.replace(/\.[^/.]+$/, '')}`;
     } catch {
       const btn = document.createElement("button");
       btn.textContent = "▶️ Abspielen";
